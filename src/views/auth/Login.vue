@@ -54,41 +54,46 @@ const titulo =ref('Hola mundo con Composition API 3');
 </script-->
 
 <script setup>
-import router from '@/router';
+//import router from '@/router';
 import authService from '@/service/AuthService';
 //import AuthService from './../../service/AuthService'; de la rutal actual(./)salimos una carpeta(../) y asi...
 import {ref} from 'vue'
-import { useRouter } from 'vue-router';
+import { useRouter } from 'vue-router'
+import ability from '@/casl/ability';
+
+
 //const titulo =ref('Hola mundo con Composition API 3');
-const usuario = ref({email: "", password: ""})
-const errores=ref({})
+const router = useRouter();
+const usuario = ref({email: "", password: ""});
+const errores=ref({});
 
 const funIngresar = async (e) => {
     e.preventDefault();//es para prevenir la recarga
-    errores.value={}
+    errores.value={};
     //alert("INGRESANDO...")
     try {
         const {data}=await authService.login(usuario.value) //es una promesa
 
         console.log(data);
         
+        //data.user.permisos.push({action: 'show', subject: 'auth'})
         localStorage.setItem("token", data.access_token)
-
+        localStorage.setItem("permisos", JSON.stringify(data.usuario.permisos))
+        //localStorage.setItem("permisos", data.user.permisos)
+        ability.update(data.usuario.permisos)       
 
         router.push({name: 'admin'})
 
         //alert("Bienvenido....")
         
     } catch (error) {
-        console.log("ERROR EN COMPONENTE LOGIN",error.response.data)
+        console.log("ERROR EN COMPONENTE LOGIN",error)
         if(error.response.data.errors){
-            errores.value=error.response.data.errors
-
+            errores.value=error.response.data.errors;
         }else{
-            alert(error.response.data.message)
-        }
-        
+            alert(error.response.data.message);
+        }        
     }
-}
+};
 
 </script>

@@ -26,8 +26,8 @@ const App =()=>{
             console.log(error)
             if(error.response.status === 401){
                 console.log("INTERCEPTOR:  401 *******")
-                //localStorage.removeItem("token")
-                //window.location.href = "/login"
+                localStorage.removeItem("token")
+                window.location.href = "/login"
             }
             if(error.response.status === 403){
                 console.log("INTERCEPTOR:  403 *******")

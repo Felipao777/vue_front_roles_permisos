@@ -1,8 +1,10 @@
 <template>
     <h1>Gestión Usuarios</h1>
-    {{ usuarios }}
-    <br>
-    <label for="">Ingresar Nombre</label>
+    {{ can('index','user') }}
+
+    <!--div v-if="ability.can('store','user')"-->
+    <div v-if="can('store','user')">
+    <label for="">Ingresar Nombre</label>   
     <input type="text" v-model="usuario.name">
     <br>
     <label for="">Ingresar Correo</label>
@@ -13,8 +15,10 @@
     <br>
     <button type="button" @click="guardarUsuario()">Guardar Usuario</button>
 
+    </div>
 
-    <table border="1">
+    <!--table border="1" v-if="ability.can('index','user') "-->
+    <table border="1" v-if="can('index','user') ">
         <thead>
             <tr>
                 <th>ID</th>
@@ -31,8 +35,10 @@
                 <td>{{ u.email }}</td>
                 <td>{{ u.created_at }}</td>
                 <td>
-                    <button type="button" @click="editarUsuario(u)">editar</button>
-                    <button type="button" @click="eliminarUsuario(u)">eliminar</button>
+                    <!--button type="button" @click="editarUsuario(u)" v-if="ability.can('update','user')">editar</button-->
+                    <!--button type="button" @click="eliminarUsuario(u)" v-if="ability.can('delete','user')">eliminar</button-->
+                    <button type="button" @click="editarUsuario(u)" v-if="can('update','user')">editar</button>
+                    <button type="button" @click="eliminarUsuario(u)" v-if="can('delete','user')">eliminar</button>
                 </td>
             </tr>
         </tbody>
@@ -45,9 +51,15 @@
 
 <script setup>
 //importaciones
+
 import UsuarioService from '@/service/UsuarioService';
 import { ref, onMounted } from 'vue';
 //import UsuarioService from "./../../../service/UsuarioService.js"
+//import ability from '@/casl/ability'; //no es necesario xq es parte de casl
+import { useAbility } from '@casl/vue';
+const {can} = useAbility ();
+
+
 
 //declaracion de variables o constantes o estados
 const usuarios= ref([])
@@ -61,9 +73,8 @@ onMounted(()=>{ //es como un constructor y es lo 1ero q carga y hay varios on...
 // metodos o funciones
 const getUsuarios= async()=>{
     const{data}= await UsuarioService.listar()
-    usuarios.value=data.data
-    
-}
+    usuarios.value=data.data    
+};
 
 const guardarUsuario= async()=>{
 
@@ -76,11 +87,11 @@ const guardarUsuario= async()=>{
     usuario.value={name:"", email:"", password:""}
 
     getUsuarios()
-}
+};
 
 const editarUsuario=(us)=>{
     usuario.value=us
-}
+};
 
 const eliminarUsuario=async(us)=>{
 
@@ -94,7 +105,7 @@ const eliminarUsuario=async(us)=>{
         }
 
     }
-}
+};
 
 
 </script>
